@@ -8,3 +8,6 @@ class RandomAgent():
     def take_action(self, obs):
         action_id = random.randrange(0, self.action_space)
         return action_id
+
+    # just for compatibility with other agents
+    def reset(self): return
