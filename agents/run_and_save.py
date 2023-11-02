@@ -1,8 +1,10 @@
 import argparse
 import pickle
+import copy
 
 import gym
 import minihack
+from nle.nethack import tty_render
 
 from random_agent import RandomAgent
 #from river_agent import RiverAgent
@@ -15,13 +17,13 @@ def perform_action(action, env):
         if action == 'pickup': action_id = 49
         if action == 'zap':
             action_id = 80
-            obs, _,_,_ = env.step(action_id)
+            o, _,_,_ = env.step(action_id)
             # Example message:
             # What do you want to zap?[f or *]
-            message = bytes(obs['message']).decode('utf-8').rstrip('\x00')
+            message = bytes(o['message']).decode('utf-8').rstrip('\x00')
             wand_char = message.split('[')[1][0] # Because of the way the message in NetHack works
             action_id = env.actions.index(ord(wand_char))
-            obs, _,_,_ = env.step(action_id)
+            o, _,_,_ = env.step(action_id)
             # Next message:
             # In what direction?
             action_id = 1 # Minotaur is always east
@@ -36,8 +38,8 @@ def perform_action(action, env):
         elif 'south' in action: action_id = 2
         elif 'west' in action: action_id = 3
 
-    obs, reward, done, info = env.step(action_id)
-    return obs, reward, done, info
+    o, reward, done, info = env.step(action_id)
+    return o, reward, done, info
 
 
 def main(env_name, random_agent, num_episodes, max_steps, path, fast_mode):
@@ -56,7 +58,7 @@ def main(env_name, random_agent, num_episodes, max_steps, path, fast_mode):
 
         o = env.reset()
         agent.reset()
-        obs.append(o)
+        obs.append(copy.deepcopy(o))
         if not fast_mode:
             env.render()
             input('Press any key to continue')
@@ -65,12 +67,13 @@ def main(env_name, random_agent, num_episodes, max_steps, path, fast_mode):
             action = agent.take_action(o)
             if not fast_mode: print(f'Action: {action}')
             o, reward, done, info = perform_action(action, env)
-            obs.append(o)
+            obs.append(copy.deepcopy(o))
 
             mean_reward = (reward - mean_reward) / (step + 1)
 
             if not fast_mode:
-                env.render()
+                #env.render()
+                print(tty_render(obs[-1]['chars'], obs[-1]['colors']))
                 input('Press any key to continue')
 
             if done: break
@@ -81,7 +84,6 @@ def main(env_name, random_agent, num_episodes, max_steps, path, fast_mode):
         print(f'Final reward: {reward}')
         print(f'Mean reward: {mean_reward}')
 
-    
     with open(path+'.pkl', 'wb') as f: pickle.dump(obs, f)
 
 
