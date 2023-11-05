@@ -1,5 +1,6 @@
 # MiniHack Datasets
-This repo is a collection of the scripts needed to generate the dataset.<br/>
+This repo is a collection of the scripts needed to generate the dataset. It is accessible at http://vps.continualai.org/data/minihack/.
+
 The dataset is a list of frames from three MiniHack environments, *i.e.* **River**, **Wand of Death - Medium** and **Quest - Easy**.<br/>
 Each frame is a dictionary, which represents an observation from the environment. It contains the `chars` and `colors` keys, as long as other information.
 
@@ -15,4 +16,4 @@ We then take the entire dataset as the concatenation of the frames per each envi
 
 ### Organization of the repo
 `run_and_play.py` is the script to let the agents play and collect the frames.<br/>
-`create_df.py` is the script that creates a pandas DataFrame for the dataset, to analyze its data; it also creates a "grouped" DataFrame, where entities with the same description (*i.e.* belonging to the same NetHack *macro-class*) are put together.
+`code/` contains some scripts to manage the dataset. In particular, `create_df.py` is the script that creates a pandas DataFrame for the dataset, to analyze its data; it also creates a "grouped" DataFrame, where entities with the same description (*i.e.* belonging to the same NetHack *macro-class*) are put together.
