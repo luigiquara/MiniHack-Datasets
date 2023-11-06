@@ -11,7 +11,8 @@ For each environment, we saved about 10k frames per type of agent. In particular
 + **Wand of Death - Medium**: $\sim$ 10k frames by a random agent (200 episodes, 50 max_steps) - $\sim$ 10k frames by a "*programmed*" agent (350 episodes, 50 max_steps);
 + **Quest - Easy**: $\sim$ 10k frames by a random agent (220 episodes, 50 max_steps) - $\sim$ 11k frames by a human player (about 270 games).
 
-We then take the entire dataset as the concatenation of the frames per each environment. `dataset.pkl` contains about 62k frames.
+We then take the entire dataset as the concatenation of the frames per each environment. `dataset.pkl` contains about 62k frames.<br/>
+Lastly, the dataset was divided into training, validation and test set, following the classic 80/20/20 ratio.
 
 
 ### Organization of the repo
