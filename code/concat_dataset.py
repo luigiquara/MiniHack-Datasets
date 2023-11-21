@@ -5,7 +5,7 @@ def add_env_agent(dataset, env, agent_mode):
         frame['env'] = env
         frame['agent_mode'] = agent_mode
 
-dir = '/home/lquarantiello/minihack_datasets/dataset/'
+dir = '/home/lquarantiello/minihack-encoder/minihack_datasets/dataset/'
 
 with open(dir+'river/human_agent.pkl', 'rb') as f: river_human = pickle.load(f)
 add_env_agent(river_human, 'river', 'human')
@@ -32,4 +32,4 @@ dataset.extend(wod_random)
 
 assert len(dataset) == len(river_human)+len(river_random)+len(quest_human)+len(quest_random)+len(wod_programmed)+len(wod_random)
 
-with open(dir+'dataset.pkl', 'wb') as f: pickle.dump(dataset, f)
+with open(dir+'uncleaned_dataset.pkl', 'wb') as f: pickle.dump(dataset, f)

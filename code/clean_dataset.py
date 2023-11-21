@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import pickle
 import numpy as np
 import pandas
@@ -21,7 +22,7 @@ def get_one_occurrences(dataset, df):
     one_occ_df = df[df['frequency'] == 1]
     one_occ_frames = []
 
-    for idx, frame in enumerate(dataset):
+    for idx, frame in tqdm(enumerate(dataset)):
         for value in zip(frame['chars'].flatten(), frame['colors'].flatten()):
             if value in list(zip(one_occ_df['char'], one_occ_df['color'])):
                 one_occ_frames.append(idx)
@@ -100,10 +101,11 @@ def split(dataset, random_state):
 
 
 def main():
-    with open('../uncleaned_dataset.pkl', 'rb') as f: dataset = pickle.load(f)
+    with open('../dataset/uncleaned_dataset.pkl', 'rb') as f: dataset = pickle.load(f)
     uniforme_frames = get_uniforme_frames(dataset)
     idxs = list(zip(*uniforme_frames))[0]
 
+    print('Removing uniform frames')
     # remove "uniform" frames, i.e. frames with all 0s
     len_total = len(dataset)
     print(f'Number of frames before cleaning: {len(dataset)}')
@@ -112,19 +114,31 @@ def main():
     assert len_total == len(dataset) + len(uniforme_frames)
 
     # crop frames, i.e. remove rows/cols with zeros
+    print('Cropping')
     dataset = list(map(crop, dataset))
-    with open('../dataset.pkl', 'wb') as f: pickle.dump(dataset, f)
+
+    # pad all frames to the same dimensions
+    print('Padding')
+    pad(dataset)
 
     # remove frames with objects with one occurrence
+    print('Removing frames with one-occurrences objects')
     df = pandas.read_pickle('../dataset/dataset.df')
     one_occ_frames = get_one_occurrences(dataset, df)
     for idx in sorted(one_occ_frames, reverse=True): dataset.pop(idx)
 
+    with open('../dataset/dataset.pkl', 'wb') as f: pickle.dump(dataset, f)
+
     # add a unique id for each {char + color} combination
     # using the created mapper from Pytorch MiniHackDataset
-    with open('../dataset/dataset.mapper', 'rb') as f: mapper = pickle.load(f)
-    add_unique_id(dataset, mapper)
+    #with open('../dataset/dataset.mapper', 'rb') as f: mapper = pickle.load(f)
+    #add_unique_id(dataset, mapper)
 
-    
+    print('Splitting and saving')
+    tr_set, val_set, test_set = split(dataset, random_state=1)
+    with open('../dataset/dataset.training.pkl', 'wb') as f: pickle.dump(tr_set, f)
+    with open('../dataset/dataset.validation.pkl', 'wb') as f: pickle.dump(val_set, f)
+    with open('../dataset/dataset.test.pkl', 'wb') as f: pickle.dump(test_set, f)
 
-    tr_set, val_set, test_set = split(dataset)
+
+if __name__ == '__main__': main()
